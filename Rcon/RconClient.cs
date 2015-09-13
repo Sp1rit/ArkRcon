@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Sockets;
 using System.Threading;
 using ConcurrentPriorityQueue;
 using Rcon.Commands;
@@ -113,6 +114,20 @@ namespace Rcon
                                 Successful = response != null,
                                 Error = "",
                                 Response = response?.Body.Trim(),
+                                Command = entry.Key
+                            };
+                            entry.Value?.Invoke(this, commandExecutedEventArgs);
+                            CommandExecuted?.Invoke(this, commandExecutedEventArgs);
+                        }
+                        catch(SocketException sEx)
+                        {
+                            Disconnect();
+
+                            var commandExecutedEventArgs = new CommandExecutedEventArgs()
+                            {
+                                Successful = false,
+                                Error = sEx.Message,
+                                Response = "",
                                 Command = entry.Key
                             };
                             entry.Value?.Invoke(this, commandExecutedEventArgs);

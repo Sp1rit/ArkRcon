@@ -8,8 +8,11 @@ namespace Rcon
     public class RconBase
     {
         private Socket socket;
+        private bool authenticated = false;
 
         public bool Connected => socket != null && socket.Connected;
+
+        public bool Authenticated => Connected && authenticated;
 
         public bool Connect(string host, int port)
         {
@@ -41,6 +44,8 @@ namespace Rcon
                 socket.Close();
                 socket = null;
             }
+
+            authenticated = false;
         }
 
         public bool Authenticate(string password)
@@ -53,6 +58,7 @@ namespace Rcon
 
             RconPacket response = SendReceive(new RconPacket(PacketType.ServerdataAuth, password));
 
+            authenticated = response.Id != -1;
             return response.Id != -1;
         }
 
@@ -64,34 +70,42 @@ namespace Rcon
             if (!Connected)
                 throw new Exception("You must be connected before sending data");
 
-            // Send
-            socket.Send(packet);
-
-            // Receive
-            byte[] buffer = new byte[socket.ReceiveBufferSize], data;
-            int size = -1, counter = 0;
-            using (MemoryStream ms = new MemoryStream())
+            try
             {
-                do
+                // Send
+                socket.Send(packet);
+
+                // Receive
+                byte[] buffer = new byte[socket.ReceiveBufferSize], data;
+                int size = -1, counter = 0;
+                using (MemoryStream ms = new MemoryStream())
                 {
-                    int count = socket.Receive(buffer);
-                    ms.Write(buffer, 0, count);
-
-                    if (size == -1 && ms.Length >= 4)
-                        size = ms.ToArray().ToInt32(0);
-
-                    if (socket.Available == 0 && (size > -1 && size + 4 > ms.Length))
+                    do
                     {
-                        Thread.Sleep(50);
-                        if (counter++ >= 3)
-                            break;
-                    }
-                } while (socket.Available > 0 || (size > -1 && size + 4 > ms.Length));
+                        int count = socket.Receive(buffer);
+                        ms.Write(buffer, 0, count);
 
-                data = ms.ToArray();
+                        if (size == -1 && ms.Length >= 4)
+                            size = ms.ToArray().ToInt32(0);
+
+                        if (socket.Available == 0 && (size > -1 && size + 4 > ms.Length))
+                        {
+                            Thread.Sleep(50);
+                            if (counter++ >= 3)
+                                break;
+                        }
+                    } while (socket.Available > 0 || (size > -1 && size + 4 > ms.Length));
+
+                    data = ms.ToArray();
+                }
+
+                return (RconPacket) data;
             }
-
-            return (RconPacket)data;
+            catch(Exception)
+            {
+                Disconnect();
+                return null;
+            }
         }
     }
 }
