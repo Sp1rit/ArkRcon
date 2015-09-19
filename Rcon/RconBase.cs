@@ -70,42 +70,34 @@ namespace Rcon
             if (!Connected)
                 throw new Exception("You must be connected before sending data");
 
-            try
-            {
-                // Send
-                socket.Send(packet);
+            // Send
+            socket.Send(packet);
 
-                // Receive
-                byte[] buffer = new byte[socket.ReceiveBufferSize], data;
-                int size = -1, counter = 0;
-                using (MemoryStream ms = new MemoryStream())
+            // Receive
+            byte[] buffer = new byte[socket.ReceiveBufferSize], data;
+            int size = -1, counter = 0;
+            using (MemoryStream ms = new MemoryStream())
+            {
+                do
                 {
-                    do
+                    int count = socket.Receive(buffer);
+                    ms.Write(buffer, 0, count);
+
+                    if (size == -1 && ms.Length >= 4)
+                        size = ms.ToArray().ToInt32(0);
+
+                    if (socket.Available == 0 && (size > -1 && size + 4 > ms.Length))
                     {
-                        int count = socket.Receive(buffer);
-                        ms.Write(buffer, 0, count);
+                        Thread.Sleep(50);
+                        if (counter++ >= 3)
+                            break;
+                    }
+                } while (socket.Available > 0 || (size > -1 && size + 4 > ms.Length));
 
-                        if (size == -1 && ms.Length >= 4)
-                            size = ms.ToArray().ToInt32(0);
-
-                        if (socket.Available == 0 && (size > -1 && size + 4 > ms.Length))
-                        {
-                            Thread.Sleep(50);
-                            if (counter++ >= 3)
-                                break;
-                        }
-                    } while (socket.Available > 0 || (size > -1 && size + 4 > ms.Length));
-
-                    data = ms.ToArray();
-                }
-
-                return (RconPacket) data;
+                data = ms.ToArray();
             }
-            catch(Exception)
-            {
-                Disconnect();
-                return null;
-            }
+
+            return (RconPacket)data;
         }
     }
 }
