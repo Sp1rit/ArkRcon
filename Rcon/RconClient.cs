@@ -62,14 +62,14 @@ namespace Rcon
             return true;
         }
 
-        public void Disconnect()
+        public void Disconnect(bool requested = true)
         {
             resetEvent.Reset();
             lock (queue)
                 queue.Clear();
 
             rcon.Disconnect();
-            Disconnected?.Invoke(this, true);
+            Disconnected?.Invoke(this, requested);
         }
 
         public void ExecuteCommandAsync(Command command, EventHandler<CommandExecutedEventArgs> callback)
@@ -121,7 +121,7 @@ namespace Rcon
                         }
                         catch(SocketException sEx)
                         {
-                            Disconnect();
+                            Disconnect(false);
 
                             var commandExecutedEventArgs = new CommandExecutedEventArgs()
                             {
