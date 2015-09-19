@@ -21,8 +21,8 @@ namespace Rcon
             if (port < 1 || port > 655359)
                 throw new ArgumentOutOfRangeException(nameof(port), "The provided port is not valid");
 
-            if (socket == null)
-                socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.IP);
+            Disconnect();
+            socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.IP);
             socket.ReceiveTimeout = 30000;
             socket.ReceiveBufferSize = 4096;
             socket.SendTimeout = 5000;
