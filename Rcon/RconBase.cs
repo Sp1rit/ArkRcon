@@ -23,7 +23,7 @@ namespace Rcon
 
             Disconnect();
             socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.IP);
-            socket.ReceiveTimeout = 30000;
+            socket.ReceiveTimeout = 5000;
             socket.ReceiveBufferSize = 4096;
             socket.SendTimeout = 5000;
             socket.SendBufferSize = 4096;
