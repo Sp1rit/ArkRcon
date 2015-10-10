@@ -4,7 +4,7 @@ namespace Rcon
 {
     public class RconPacket
     {
-        private static int idCounter = 0;
+        private static int idCounter = 1;
 
         public int Id { get; set; }
         public PacketType Type { get; set; }

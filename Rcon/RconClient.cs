@@ -109,6 +109,9 @@ namespace Rcon
                             RconPacket request = new RconPacket(PacketType.ServerdataExeccommand, entry.Key.ToString());
                             RconPacket response = rcon.SendReceive(request);
 
+                            if (request.Id != response.Id)
+                                throw new Exception("Got a response with a wrong ID!");
+
                             var commandExecutedEventArgs = new CommandExecutedEventArgs()
                             {
                                 Successful = response != null,
