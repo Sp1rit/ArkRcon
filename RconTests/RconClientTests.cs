@@ -11,15 +11,18 @@ namespace Rcon.Tests
     [TestClass()]
     public class RconClientTests
     {
-        private const string host = "server.xunion.net";
-        private const int port = 49477;
-        private const string password = "***REMOVED***";
+        public TestContext TestContext { get; set; }
+
+        private string Host => TestContext.Properties["Host"].ToString();
+        private int Port => int.Parse(TestContext.Properties["Port"].ToString());
+        private string Password => TestContext.Properties["Password"].ToString();
+
 
         [TestMethod()]
         public void RconClientTest()
         {
             RconClient client = new RconClient();
-
+           
             Assert.IsInstanceOfType(client, typeof(RconClient));
             Assert.IsFalse(client.IsConnected);
         }
@@ -29,7 +32,7 @@ namespace Rcon.Tests
         public void ConnectTestNullHost()
         {
             RconClient client = new RconClient();
-            client.Connect(null, port, password);
+            client.Connect(null, Port, Password);
         }
 
         [TestMethod()]
@@ -37,7 +40,7 @@ namespace Rcon.Tests
         public void ConnectTestEmptyHost()
         {
             RconClient client = new RconClient();
-            client.Connect("", port, password);
+            client.Connect("", Port, Password);
         }
 
         [TestMethod()]
@@ -45,7 +48,7 @@ namespace Rcon.Tests
         public void ConnectTestNegativePort()
         {
             RconClient client = new RconClient();
-            client.Connect(host, -1, password);
+            client.Connect(Host, -1, Password);
         }
 
         [TestMethod()]
@@ -53,7 +56,7 @@ namespace Rcon.Tests
         public void ConnectTestInvalidPort()
         {
             RconClient client = new RconClient();
-            client.Connect(host, 66666, password);
+            client.Connect(Host, 66666, Password);
         }
 
         [TestMethod()]
@@ -61,7 +64,7 @@ namespace Rcon.Tests
         public void ConnectTestNullPassword()
         {
             RconClient client = new RconClient();
-            client.Connect(host, port, null);
+            client.Connect(Host, Port, null);
         }
 
         [TestMethod()]
@@ -69,7 +72,7 @@ namespace Rcon.Tests
         public void ConnectTestEmptyPassword()
         {
             RconClient client = new RconClient();
-            client.Connect(host, port, "");
+            client.Connect(Host, Port, "");
         }
 
         [TestMethod()]
@@ -78,7 +81,7 @@ namespace Rcon.Tests
         {
             RconClient client = new RconClient();
 
-            Assert.IsTrue(client.Connect("InvalidHost", port, password));
+            Assert.IsTrue(client.Connect("InvalidHost", Port, Password));
             Assert.IsTrue(client.IsConnected);
 
             client.Disconnect();
@@ -90,7 +93,7 @@ namespace Rcon.Tests
         {
             RconClient client = new RconClient();
 
-            Assert.IsTrue(client.Connect("google.de", port, password));
+            Assert.IsTrue(client.Connect("google.de", Port, Password));
             Assert.IsTrue(client.IsConnected);
 
             client.Disconnect();
@@ -102,7 +105,7 @@ namespace Rcon.Tests
         {
             RconClient client = new RconClient();
 
-            Assert.IsTrue(client.Connect(host, 1337, password));
+            Assert.IsTrue(client.Connect(Host, 1337, Password));
             Assert.IsTrue(client.IsConnected);
 
             client.Disconnect();
@@ -114,7 +117,7 @@ namespace Rcon.Tests
         {
             RconClient client = new RconClient();
 
-            Assert.IsTrue(client.Connect(host, port, "password"));
+            Assert.IsTrue(client.Connect(Host, Port, "password"));
             Assert.IsTrue(client.IsConnected);
 
             client.Disconnect();
@@ -125,7 +128,7 @@ namespace Rcon.Tests
         {
             RconClient client = new RconClient();
 
-            Assert.IsTrue(client.Connect(host, port, password));
+            Assert.IsTrue(client.Connect(Host, Port, Password));
             Assert.IsTrue(client.IsConnected);
 
             client.Disconnect();
@@ -136,7 +139,7 @@ namespace Rcon.Tests
         {
             RconClient client = new RconClient();
 
-            Assert.IsTrue(client.Connect(host, port, password));
+            Assert.IsTrue(client.Connect(Host, Port, Password));
             Assert.IsTrue(client.IsConnected);
 
             client.Disconnect();
@@ -149,10 +152,10 @@ namespace Rcon.Tests
         {
             RconClient client = new RconClient();
 
-            Assert.IsTrue(client.Connect(host, port, password));
+            Assert.IsTrue(client.Connect(Host, Port, Password));
             Assert.IsTrue(client.IsConnected);
 
-            client.ExecuteCommandAsync(new Commands.ListPlayers(), (s, e) => Assert.IsTrue(e.Successful));
+            client.ExecuteCommandAsync(new Rcon.Commands.ListPlayers(), (s, e) => Assert.IsTrue(e.Successful));
 
             client.Disconnect();
         }
@@ -162,10 +165,10 @@ namespace Rcon.Tests
         {
             RconClient client = new RconClient();
 
-            Assert.IsTrue(client.Connect(host, port, password));
+            Assert.IsTrue(client.Connect(Host, Port, Password));
             Assert.IsTrue(client.IsConnected);
 
-            client.ExecuteLowPrioCommandAsync(new Commands.ListPlayers(), (s, e) => Assert.IsTrue(e.Successful));
+            client.ExecuteLowPrioCommandAsync(new Rcon.Commands.ListPlayers(), (s, e) => Assert.IsTrue(e.Successful));
 
             client.Disconnect();
         }

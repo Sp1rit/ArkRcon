@@ -11,15 +11,17 @@ namespace Rcon.Tests
     [TestClass()]
     public class RconBaseTests
     {
-        private const string host = "server.xunion.net";
-        private const int port = 49477;
-        private const string password = "***REMOVED***";
+        public TestContext TestContext { get; set; }
+
+        private string Host => TestContext.Properties["Host"].ToString();
+        private int Port => int.Parse(TestContext.Properties["Port"].ToString());
+        private string Password => TestContext.Properties["Password"].ToString();
 
         [TestMethod()]
         public void ConnectTest()
         {
             RconBase client = new RconBase();
-            Assert.IsTrue(client.Connect(host, port));
+            Assert.IsTrue(client.Connect(Host, Port));
             Assert.IsTrue(client.Connected);
             client.Disconnect();
         }
@@ -29,7 +31,7 @@ namespace Rcon.Tests
         public void ConnectTestNullHost()
         {
             RconBase client = new RconBase();
-            client.Connect(null, port);
+            client.Connect(null, Port);
         }
 
         [TestMethod()]
@@ -37,7 +39,7 @@ namespace Rcon.Tests
         public void ConnectTestEmptyHost()
         {
             RconBase client = new RconBase();
-            client.Connect("", port);
+            client.Connect("", Port);
         }
 
         [TestMethod()]
@@ -45,7 +47,7 @@ namespace Rcon.Tests
         public void ConnectTestNegativePort()
         {
             RconBase client = new RconBase();
-            client.Connect(host, -1);
+            client.Connect(Host, -1);
         }
 
         [TestMethod()]
@@ -53,14 +55,14 @@ namespace Rcon.Tests
         public void ConnectTestInvalidPort()
         {
             RconBase client = new RconBase();
-            client.Connect(host, 66666);
+            client.Connect(Host, 66666);
         }
 
         [TestMethod()]
         public void DisconnectTest()
         {
             RconBase client = new RconBase();
-            client.Connect(host, port);
+            client.Connect(Host, Port);
             Assert.IsTrue(client.Connected);
             client.Disconnect();
             Assert.IsFalse(client.Connected);
@@ -70,8 +72,8 @@ namespace Rcon.Tests
         public void AuthenticateTest()
         {
             RconBase client = new RconBase();
-            client.Connect(host, port);
-            Assert.IsTrue(client.Authenticate(password));
+            client.Connect(Host, Port);
+            Assert.IsTrue(client.Authenticate(Password));
             Assert.IsTrue(client.Authenticated);
             client.Disconnect();
         }
@@ -81,7 +83,7 @@ namespace Rcon.Tests
         public void AuthenticateTestEmptyPassword()
         {
             RconBase client = new RconBase();
-            client.Connect(host, port);
+            client.Connect(Host, Port);
             client.Authenticate("");
         }
 
@@ -90,7 +92,7 @@ namespace Rcon.Tests
         public void AuthenticateTestNullPassword()
         {
             RconBase client = new RconBase();
-            client.Connect(host, port);
+            client.Connect(Host, Port);
             client.Authenticate(null);
         }
 
@@ -99,16 +101,16 @@ namespace Rcon.Tests
         public void AuthenticateTestNotConnected()
         {
             RconBase client = new RconBase();
-            client.Authenticate(password);
+            client.Authenticate(Password);
         }
 
         [TestMethod()]
         public void SendReceiveTest()
         {
             RconBase client = new RconBase();
-            client.Connect(host, port);
-            client.Authenticate(password);
-            RconPacket request = new RconPacket(PacketType.ServerdataExeccommand, new Commands.ListPlayers().ToString());
+            client.Connect(Host, Port);
+            client.Authenticate(Password);
+            RconPacket request = new RconPacket(PacketType.ServerdataExeccommand, new Rcon.Commands.ListPlayers().ToString());
             RconPacket response = client.SendReceive(request);
             Assert.IsInstanceOfType(response, typeof(RconPacket));
             Assert.AreEqual(request.Id, response.Id);
