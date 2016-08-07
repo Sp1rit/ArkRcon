@@ -24,6 +24,12 @@
         SetMessageOfTheDay,
         SetTimeOfDay,
         ShowMessageOfTheDay,
-        UnbanPlayer
+        UnbanPlayer,
+        OpenMap,
+        GetGameLog,
+        DestroyWildDinos,
+        DestroyStructures,
+        RenamePlayer,
+        RenameTribe
     }
 }
