@@ -72,6 +72,48 @@ namespace Rcon
             Disconnected?.Invoke(this, requested);
         }
 
+        public CommandExecutedEventArgs ExecuteCommand(Command command)
+        {
+            try
+            {
+                RconPacket request = new RconPacket(PacketType.ServerdataExeccommand, command.ToString());
+                RconPacket response = rcon.SendReceive(request);
+
+                if (request.Id != response.Id)
+                    throw new Exception("Got a response with a wrong ID!");
+
+                return new CommandExecutedEventArgs()
+                {
+                    Successful = response != null,
+                    Error = "",
+                    Response = response?.Body.Trim(),
+                    Command = command
+                };
+            }
+            catch (SocketException sEx)
+            {
+                Disconnect(false);
+
+                return new CommandExecutedEventArgs()
+                {
+                    Successful = false,
+                    Error = sEx.Message,
+                    Response = "",
+                    Command = command
+                };
+            }
+            catch (Exception ex)
+            {
+                return new CommandExecutedEventArgs()
+                {
+                    Successful = false,
+                    Error = ex.Message,
+                    Response = "",
+                    Command = command
+                };
+            }
+        }
+
         public void ExecuteCommandAsync(Command command, EventHandler<CommandExecutedEventArgs> callback)
         {
             lock (queue)

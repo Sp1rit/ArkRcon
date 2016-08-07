@@ -48,6 +48,12 @@
     <Compile Include="CommandFactory.cs" />
     <Compile Include="Commands\AllowPlayerToJoinNoCheck.cs" />
     <Compile Include="Commands\BanPlayer.cs" />
+    <Compile Include="Commands\RenameTribe.cs" />
+    <Compile Include="Commands\RenamePlayer.cs" />
+    <Compile Include="Commands\DestroyAllStructures.cs" />
+    <Compile Include="Commands\DestroyWildDinos.cs" />
+    <Compile Include="Commands\GetGameLog.cs" />
+    <Compile Include="Commands\OpenMap.cs" />
     <Compile Include="Commands\Broadcast.cs" />
     <Compile Include="Commands\Command.cs" />
     <Compile Include="Commands\CommandType.cs" />
